@@ -6,4 +6,4 @@ end
 
 
 calc = StringCalculator.new
-puts calc.add()
+puts calc.add("")
