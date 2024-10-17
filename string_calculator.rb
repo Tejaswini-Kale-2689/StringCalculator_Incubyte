@@ -1,41 +1,64 @@
 require "pry"
 class StringCalculator
-  def add(numbers)
-    return 0 if numbers.empty?
+  # Public method to add numbers from the string
+  def add(input)
+    return 0 if input.empty?
 
-    delimiter = ",|\n"
-    if numbers.start_with?("//")
-      delimiter, numbers = parse_delimiters(numbers)
-    end
+    delimiters, numbers = parse_input(input)
+    number_list = extract_numbers(numbers, delimiters)
 
-    number_array = numbers.split(/#{delimiter}/).map(&:to_i)
+    validate_no_negatives(number_list)
 
-    negative_numbers = number_array.select { |num| num < 0 }
-    raise "Negative numbers not allowed: #{negative_numbers.join(', ')}" unless negative_numbers.empty?
-
-    number_array.reject { |num| num > 1000 }.sum
+    sum_of_numbers(number_list)
   end
 
   private
 
-  def parse_delimiters(numbers)
-    # Check for multiple or single custom delimiters within square brackets
-    if numbers =~ %r{//(\[.+\])\n}
-      # Capture all delimiters within brackets
-      delimiters = numbers.scan(%r{\[(.+?)\]})
-      # Flatten the array, escape special characters, and join with `|` for the regex
-      delimiters_regex = delimiters.flatten.map { |delim| Regexp.escape(delim) }.join("|")
-      # Extract the rest of the string after the newline character
-      rest_of_string = numbers.split("\n", 2)[1]
-      [delimiters_regex, rest_of_string]
+  # Method to parse the input and extract delimiters and number string
+  def parse_input(input)
+    if custom_delimiter?(input)
+      parse_custom_delimiters(input)
     else
-      # For single character delimiters (without brackets)
-      delimiter = numbers[2]
-      rest_of_string = numbers[4..]
-      [Regexp.escape(delimiter), rest_of_string]
+      [",|\n", input] # Default delimiters: comma or newline
     end
   end
+
+  # Check if the input starts with a custom delimiter
+  def custom_delimiter?(input)
+    input.start_with?("//")
+  end
+
+  # Method to extract custom delimiters and the number string
+  def parse_custom_delimiters(input)
+    if input =~ %r{//(\[.+?\])+\n} # Matches custom delimiters enclosed in brackets
+      delimiters = input.scan(%r{\[(.+?)\]}).flatten
+      delimiters_regex = delimiters.map { |d| Regexp.escape(d) }.join("|")
+      numbers = input.split("\n", 2).last
+      [delimiters_regex, numbers]
+    else
+      single_delimiter = Regexp.escape(input[2])
+      numbers = input[4..]
+      [single_delimiter, numbers]
+    end
+  end
+
+  # Method to extract and convert the numbers from the string
+  def extract_numbers(numbers, delimiters)
+    numbers.split(/#{delimiters}/).map(&:to_i)
+  end
+
+  # Method to validate and raise error for negative numbers
+  def validate_no_negatives(numbers)
+    negatives = numbers.select { |num| num < 0 }
+    raise "Negative numbers not allowed: #{negatives.join(', ')}" if negatives.any?
+  end
+
+  # Method to sum the numbers, ignoring those greater than 1000
+  def sum_of_numbers(numbers)
+    numbers.reject { |num| num > 1000 }.sum
+  end
 end
+
 
 
 calc = StringCalculator.new
