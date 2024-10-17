@@ -34,7 +34,7 @@ RSpec.describe StringCalculator do
       end
     end
 
-    context 'when input contains a multiple delimiters or a custom delimiters' do
+    context 'when input contains a custom delimiters' do
       it 'returns the sum of the numbers using the custom delimiter' do
         expect(calculator.add("//;\n1;2")).to eq(3)
         expect(calculator.add("//;\n4;6;8")).to eq(18)
@@ -50,5 +50,13 @@ RSpec.describe StringCalculator do
         expect { calculator.add("1,-2,-3,4") }.to raise_error("Negative numbers not allowed: -2, -3")
       end
     end
+
+    context 'when input contains numbers larger than 1000' do
+      it 'ignores numbers larger than 1000' do
+        expect(calculator.add("2,1001,6")).to eq(8)
+        expect(calculator.add("1001,2000,3")).to eq(3)
+      end
+    end
+    
   end
 end
