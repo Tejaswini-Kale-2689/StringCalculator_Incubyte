@@ -8,6 +8,10 @@ class StringCalculator
     end
 
     number_array = numbers.split(/#{delimiter}/).map(&:to_i)
+
+    negative_numbers = number_array.select { |num| num < 0 }
+    raise "Negative numbers not allowed: #{negative_numbers.join(', ')}" unless negative_numbers.empty?
+
     number_array.sum
   end
 
@@ -27,3 +31,4 @@ puts calc.add("2,4")
 puts calc.add("2,4,6")
 puts calc.add("2,4\n6")
 puts calc.add("//;\n1;2")
+#puts calc.add("-1;-2")

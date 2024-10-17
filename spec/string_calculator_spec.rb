@@ -22,7 +22,7 @@ RSpec.describe StringCalculator do
       end
     end
 
-    context 'when input contains more than two numbers separated by a comma' do
+    context 'when input contains more than two numbers or unlimitted nembers separated by a comma' do
       it 'returns the sum of the numbers' do
         expect(calculator.add("1,2,6,7")).to eq(16)
       end
@@ -38,6 +38,16 @@ RSpec.describe StringCalculator do
       it 'returns the sum of the numbers using the custom delimiter' do
         expect(calculator.add("//;\n1;2")).to eq(3)
         expect(calculator.add("//;\n4;6;8")).to eq(18)
+      end
+    end
+
+    context 'when input contains negative numbers' do
+      it 'raises an exception with the message "Negative numbers not allowed"' do
+        expect { calculator.add("1,-2,3") }.to raise_error("Negative numbers not allowed: -2")
+      end
+
+      it 'raises an exception listing all negative numbers' do
+        expect { calculator.add("1,-2,-3,4") }.to raise_error("Negative numbers not allowed: -2, -3")
       end
     end
   end
